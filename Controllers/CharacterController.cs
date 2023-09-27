@@ -14,22 +14,21 @@ namespace net7.Controllers
         }
        
         [HttpGet("GetAll")]
-        public ActionResult<List<Character>> Get() 
+        public async Task<ActionResult<ServiceResponse<List<Character>>>> Get() 
         {
-            return Ok(characterService.GetAllCharacters());
+            return Ok( await characterService.GetAllCharacters());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Character> GetByIndex(int id) 
+        public async Task<ActionResult<ServiceResponse<Character>>> GetByIndex(int id) 
         {
-            return Ok(characterService.GetCharacterById(id));
+            return Ok(await characterService.GetCharacterById(id));
         }
 
         [HttpPost]
-        public ActionResult<List<Character>> AddNew(Character character) 
+        public async Task<ActionResult<ServiceResponse<List<Character>>>> AddNew(Character character) 
         {
-            return Ok(characterService.AddCharacter(character));
+            return Ok(await characterService.AddCharacter(character));
         }
-
     }
 }
