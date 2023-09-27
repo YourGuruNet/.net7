@@ -1,8 +1,8 @@
-namespace net7.Models
+
+namespace net7.Dtos.Character
 {
-    public class Character
+    public class AddCharacterDto
     {
-        public int Id {get; set;}
         public string Name {get; set;} = "Ano";
         public int HitPoint {get; set;} = 100;
         public int Strength {get; set;} = 10;

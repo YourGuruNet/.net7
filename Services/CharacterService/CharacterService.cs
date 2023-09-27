@@ -9,26 +9,26 @@ namespace net7.Services.CharacterService
             new Character {Id = 2, Name = "Arv"},
         };
 
-        public async Task<ServiceResponse<List<Character>>> AddCharacter(Character character)
+        public async  Task<ServiceResponse<List<GetCharacterDto>>> AddCharacter(AddCharacterDto character)
         {
-            var serviceResponse = new ServiceResponse<List<Character>>();
+            var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
              characters.Add(character);
              serviceResponse.Data = characters;
              return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<Character>>> GetAllCharacters()
+        public async  Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters()
         {
-            var serviceResponse = new ServiceResponse<List<Character>>
+            var serviceResponse = new ServiceResponse<List<GetCharacterDto>>
             {
                 Data = characters
             };
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Character>> GetCharacterById(int id)
+        public async Task<ServiceResponse<GetCharacterDto>> GetCharacterById(int id)
         {
-            var serviceResponse = new ServiceResponse<Character>();
+            var serviceResponse = new ServiceResponse<GetCharacterDto>();
             var character = characters.FirstOrDefault(character => character.Id == id);
             serviceResponse.Data = character;
             return serviceResponse;  

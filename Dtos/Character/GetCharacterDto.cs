@@ -1,6 +1,6 @@
-namespace net7.Models
+namespace net7.Dtos.Character
 {
-    public class Character
+    public class GetCharacterDto
     {
         public int Id {get; set;}
         public string Name {get; set;} = "Ano";

@@ -1,5 +1,7 @@
 global using net7.Models;
 global using net7.Services.CharacterService;
+global using net7.Enums;
+global using net7.Dtos.Character;
 
 var builder = WebApplication.CreateBuilder(args);
 
