@@ -26,7 +26,7 @@ namespace net7.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<List<Character>>>> AddNew(Character character) 
+        public async Task<ActionResult<ServiceResponse<List<Character>>>> AddNew(AddCharacterDto character) 
         {
             return Ok(await characterService.AddCharacter(character));
         }
