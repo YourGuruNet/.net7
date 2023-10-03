@@ -30,5 +30,15 @@ namespace net7.Controllers
         {
             return Ok(await characterService.AddCharacter(character));
         }
+
+        [HttpPut]
+        public async Task<ActionResult<ServiceResponse<List<Character>>>> Update(UpdateCharacterDto character) 
+        {
+            var response = await characterService.UpdateCharacter(character);
+            if (response.Data is null) {
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
     }
 }

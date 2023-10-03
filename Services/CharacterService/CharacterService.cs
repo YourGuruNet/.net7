@@ -12,7 +12,6 @@ namespace net7.Services.CharacterService
         public CharacterService(IMapper mapper)
         {
             this.mapper = mapper;
-
         }
 
         public async  Task<ServiceResponse<List<GetCharacterDto>>> AddCharacter(AddCharacterDto character)
@@ -40,6 +39,28 @@ namespace net7.Services.CharacterService
             var character = characters.FirstOrDefault(character => character.Id == id);
             serviceResponse.Data = mapper.Map<GetCharacterDto>(character);
             return serviceResponse;  
+        }
+
+        public async Task<ServiceResponse<GetCharacterDto>> UpdateCharacter(UpdateCharacterDto character) 
+        {   
+            var serviceResponse = new ServiceResponse<GetCharacterDto>();
+            try {
+                var newCharacter = characters.FirstOrDefault(c => c.Id == character.Id) ?? throw new Exception($"Characters Id is incorrect");
+                newCharacter.Name = character.Name;
+                newCharacter.HitPoint = character.HitPoint;
+                newCharacter.Strength = character.Strength;
+                newCharacter.Defense = character.Defense;
+                newCharacter.Intelligence = character.Intelligence;
+                newCharacter.Class = character.Class;
+                serviceResponse.Data = mapper.Map<GetCharacterDto>(newCharacter);
+                return serviceResponse; 
+            } 
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+                return serviceResponse;
+            }
         }
     }
 }
