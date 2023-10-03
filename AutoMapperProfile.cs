@@ -10,7 +10,8 @@ namespace net7
         public AutoMapperProfile()
         {
             CreateMap<Character, GetCharacterDto>();
-             CreateMap<AddCharacterDto, Character>();
+            CreateMap<AddCharacterDto, Character>();
+            CreateMap<UpdateCharacterDto, Character>();
         }
     }
 }

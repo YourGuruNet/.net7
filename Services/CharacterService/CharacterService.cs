@@ -46,12 +46,7 @@ namespace net7.Services.CharacterService
             var serviceResponse = new ServiceResponse<GetCharacterDto>();
             try {
                 var newCharacter = characters.FirstOrDefault(c => c.Id == character.Id) ?? throw new Exception($"Characters Id is incorrect");
-                newCharacter.Name = character.Name;
-                newCharacter.HitPoint = character.HitPoint;
-                newCharacter.Strength = character.Strength;
-                newCharacter.Defense = character.Defense;
-                newCharacter.Intelligence = character.Intelligence;
-                newCharacter.Class = character.Class;
+                mapper.Map(character, newCharacter);
                 serviceResponse.Data = mapper.Map<GetCharacterDto>(newCharacter);
                 return serviceResponse; 
             } 
