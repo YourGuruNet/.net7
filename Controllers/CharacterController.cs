@@ -40,5 +40,15 @@ namespace net7.Controllers
             }
             return Ok(response);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ServiceResponse<List<Character>>>> Delete(int id) 
+        {
+            var response = await characterService.DeleteCharacter(id);
+            if (response.Data is null) {
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
     }
 }

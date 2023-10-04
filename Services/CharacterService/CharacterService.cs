@@ -57,5 +57,24 @@ namespace net7.Services.CharacterService
                 return serviceResponse;
             }
         }
+
+        public async Task<ServiceResponse<List<GetCharacterDto>>> DeleteCharacter(int id)
+        {
+            var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
+            try 
+            {
+                var character = characters.First(character => character.Id == id) ?? throw new Exception($"Characters Id is incorrect");
+                characters.Remove(character);
+
+                serviceResponse.Data = characters.Select(c => mapper.Map<GetCharacterDto>(c)).ToList();
+                return serviceResponse; 
+            } 
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+                return serviceResponse;
+            }
+        }
     }
 }
