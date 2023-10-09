@@ -9,5 +9,6 @@ namespace net7.Data
         }
 
         public DbSet<Character> Characters => Set<Character>();
+        public DbSet<User> User => Set<User>();
     }
 }
