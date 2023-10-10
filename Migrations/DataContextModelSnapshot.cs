@@ -81,7 +81,7 @@ namespace net7.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("net7.Models.Character", b =>
