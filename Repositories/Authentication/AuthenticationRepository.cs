@@ -16,9 +16,27 @@ namespace net7.Repositories.Authentication
             _dataContext = dataContext;
             _mapper = mapper;
         }
-        public Task<ServiceResponse<string>> Login(string userName, string password)
+        public async Task<ServiceResponse<int>> Login(string userName, string password)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<int>();
+            var badLoginException = new Exception($"Login failed");
+            try 
+            {
+                var user  = await _dataContext.Users.FirstOrDefaultAsync(user => user.UserName == userName) ?? throw badLoginException;
+                var validUserLogin = VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt);
+                if(!validUserLogin) {
+                    throw badLoginException;
+                }
+
+                response.Data = user.Id;
+                return response;
+            } 
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                return response;
+            }
         }
 
         public async Task<ServiceResponse<int>> Register(User user, string password)
@@ -47,11 +65,16 @@ namespace net7.Repositories.Authentication
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt) 
         {
-            using(var hmac = new System.Security.Cryptography.HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF32.GetBytes(password));
-            }
+            using var hmac = new System.Security.Cryptography.HMACSHA512();
+            passwordSalt = hmac.Key;
+            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        }
+
+         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt) 
+        {
+            using var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt);
+            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            return computedHash.SequenceEqual(passwordHash);
         }
     }
 }
