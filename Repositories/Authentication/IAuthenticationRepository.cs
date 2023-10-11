@@ -9,6 +9,6 @@ namespace net7.Repositories.Authentication
     {
         Task<ServiceResponse<int>> Register(User user, string password);
         Task<ServiceResponse<string>> Login(string userName, string password);
-        Task<ServiceResponse<bool>> UserExist(string userName);
+        Task<bool> UserExist(string userName);
     }
 }
