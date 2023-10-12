@@ -8,7 +8,7 @@ namespace net7.Repositories.Authentication
     public interface IAuthenticationRepository
     {
         Task<ServiceResponse<int>> Register(User user, string password);
-        Task<ServiceResponse<int>> Login(string userName, string password);
+        Task<ServiceResponse<string>> Login(string userName, string password);
         Task<bool> UserExist(string userName);
     }
 }

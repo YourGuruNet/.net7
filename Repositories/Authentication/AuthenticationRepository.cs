@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
 
 namespace net7.Repositories.Authentication
 {
@@ -10,15 +10,17 @@ namespace net7.Repositories.Authentication
 
         private readonly IMapper _mapper;
         private readonly DataContext _dataContext;
+        private readonly IConfiguration _configuration;
 
-        public AuthenticationRepository(IMapper mapper, DataContext dataContext)
+        public AuthenticationRepository(IMapper mapper, DataContext dataContext, IConfiguration configuration)
         {
+            _configuration = configuration;
             _dataContext = dataContext;
             _mapper = mapper;
         }
-        public async Task<ServiceResponse<int>> Login(string userName, string password)
+        public async Task<ServiceResponse<string>> Login(string userName, string password)
         {
-            var response = new ServiceResponse<int>();
+            var response = new ServiceResponse<string>();
             var badLoginException = new Exception($"Login failed");
             try 
             {
@@ -28,7 +30,7 @@ namespace net7.Repositories.Authentication
                     throw badLoginException;
                 }
 
-                response.Data = user.Id;
+                response.Data = CreateToken(user);
                 return response;
             } 
             catch (Exception ex)
@@ -70,11 +72,37 @@ namespace net7.Repositories.Authentication
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
 
-         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt) 
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt) 
         {
             using var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt);
             var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             return computedHash.SequenceEqual(passwordHash);
+        }
+
+        private string CreateToken(User user) 
+        {
+            var claims = new List<Claim> 
+            {
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(ClaimTypes.Name, user.UserName)
+            };
+            var appSettingsToken = _configuration.GetSection("AppSettings:Token").Value ?? throw new Exception("Token invalid");
+
+            SymmetricSecurityKey key = new(System.Text.Encoding.UTF8.GetBytes(appSettingsToken));
+
+            SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = creds
+            };
+
+            JwtSecurityTokenHandler tokenHandler = new();
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+            return tokenString;
         }
     }
 }

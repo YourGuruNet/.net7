@@ -32,9 +32,9 @@ namespace net7.Services.CharacterService
             return serviceResponse;
         }
 
-        public async  Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters()
+        public async  Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters(int userId)
         {
-            var dbCharacters = await _dataContext.Characters.ToListAsync();
+            var dbCharacters = await _dataContext.Characters.Where(character => character.User!.Id == userId).ToListAsync();
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>
             {
                 Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList()

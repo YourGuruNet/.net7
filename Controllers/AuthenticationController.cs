@@ -27,10 +27,10 @@ namespace net7.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<ServiceResponse<int>>> Login(UserRegisterDto request)
+        public async Task<ActionResult<ServiceResponse<string>>> Login(UserRegisterDto request)
         {
             var response = await _authenticationRepository.Login(
-                request.UserName , request.Password
+                request.UserName, request.Password
             );
             if(!response.Success){
                 return BadRequest(response);
