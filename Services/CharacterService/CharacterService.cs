@@ -1,15 +1,21 @@
+using System.Security.Claims;
+
 namespace net7.Services.CharacterService
 {
     public class CharacterService : ICharacterService
     {
         private readonly IMapper _mapper;
         private readonly DataContext _dataContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CharacterService(IMapper mapper ,DataContext dataContext)
+        public CharacterService(IMapper mapper ,DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
+            _httpContextAccessor = httpContextAccessor;
             _dataContext = dataContext;
             _mapper = mapper;
         }
+
+        private int GetUserId() => int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         public async Task<ServiceResponse<List<GetCharacterDto>>> AddCharacter(AddCharacterDto character)
         {
@@ -32,8 +38,9 @@ namespace net7.Services.CharacterService
             return serviceResponse;
         }
 
-        public async  Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters(int userId)
+        public async  Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters()
         {
+            var userId = GetUserId();
             var dbCharacters = await _dataContext.Characters.Where(character => character.User!.Id == userId).ToListAsync();
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>
             {

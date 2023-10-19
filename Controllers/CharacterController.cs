@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,8 +18,7 @@ namespace net7.Controllers
         [HttpGet("GetAll")]
         public async Task<ActionResult<ServiceResponse<List<Character>>>> Get() 
         {
-            int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value); 
-            return Ok( await characterService.GetAllCharacters(userId));
+            return Ok( await characterService.GetAllCharacters());
         }
 
         [HttpGet("{id}")]
