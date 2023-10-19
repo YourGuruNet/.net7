@@ -24,9 +24,11 @@ namespace net7.Services.CharacterService
             try
             {
                 var newCharacter = _mapper.Map<Character>(character);
+                var userId = GetUserId();
+                newCharacter.User = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
                 _dataContext.Characters.Add(newCharacter);
                 await _dataContext.SaveChangesAsync(); 
-                var dbCharacters = await _dataContext.Characters.ToListAsync();
+               var dbCharacters = await _dataContext.Characters.Where(character => character.User!.Id == userId).ToListAsync();
                 serviceResponse.Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
             }
             catch (Exception ex)
@@ -52,20 +54,27 @@ namespace net7.Services.CharacterService
         public async Task<ServiceResponse<GetCharacterDto>> GetCharacterById(int id)
         {
             var serviceResponse = new ServiceResponse<GetCharacterDto>();
-            var character = await _dataContext.Characters.FirstOrDefaultAsync(character => character.Id == id);
+            var userId = GetUserId();
+            var character = await _dataContext.Characters.FirstOrDefaultAsync(character => character.Id == id && character.User!.Id == userId);
             serviceResponse.Data = _mapper.Map<GetCharacterDto>(character);
             return serviceResponse;  
         }
 
-        public async Task<ServiceResponse<GetCharacterDto>> UpdateCharacter(UpdateCharacterDto character) 
+        public async Task<ServiceResponse<GetCharacterDto>> UpdateCharacter(UpdateCharacterDto newCharacter) 
         {   
             var serviceResponse = new ServiceResponse<GetCharacterDto>();
             try 
             {
-                var newCharacter = await _dataContext.Characters.FirstOrDefaultAsync(c => c.Id == character.Id) ?? throw new Exception($"Characters Id is incorrect");
-                _mapper.Map(character, newCharacter);
+                var userId = GetUserId();
+                var character = await _dataContext.Characters
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(c => c.Id == newCharacter.Id);
+                if(character is null || character!.User!.Id != userId)
+                    throw new Exception($"Characters Id is incorrect");
+     
+                _mapper.Map(newCharacter, character);
                 await _dataContext.SaveChangesAsync(); 
-                serviceResponse.Data = _mapper.Map<GetCharacterDto>(newCharacter);
+                serviceResponse.Data = _mapper.Map<GetCharacterDto>(character);
                 return serviceResponse; 
             } 
             catch (Exception ex)
@@ -81,7 +90,9 @@ namespace net7.Services.CharacterService
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
             try 
             {
-                var character = await _dataContext.Characters.FirstAsync(character => character.Id == id) ?? throw new Exception($"Characters Id is incorrect");
+                var userId = GetUserId();
+                var character = await _dataContext.Characters.FirstOrDefaultAsync(character => character.Id == id && character.User!.Id == userId) 
+                ?? throw new Exception($"Characters is not available for you");
                 _dataContext.Characters.Remove(character);
                 await _dataContext.SaveChangesAsync();
                 serviceResponse.Data = await _dataContext.Characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToListAsync();

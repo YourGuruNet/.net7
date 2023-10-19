@@ -18,7 +18,7 @@ namespace net7.Controllers
         [HttpGet("GetAll")]
         public async Task<ActionResult<ServiceResponse<List<Character>>>> Get() 
         {
-            return Ok( await characterService.GetAllCharacters());
+            return Ok(await characterService.GetAllCharacters());
         }
 
         [HttpGet("{id}")]
