@@ -8,7 +8,18 @@ namespace net7.Data
 
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Skill>().HasData(
+                new Skill { Id = 1, Name = "Fireball", Damage = 20 },
+                new Skill { Id = 2, Name = "Frenzy", Damage = 30 },
+                new Skill { Id = 3, Name = "Blizzard", Damage = 50 }
+            );
+        }
+
         public DbSet<Character> Characters => Set<Character>();
         public DbSet<User> Users => Set<User>();
+        public DbSet<Weapon> Weapon => Set<Weapon>();
+        public DbSet<Skill> Skill => Set<Skill>();
     }
 }

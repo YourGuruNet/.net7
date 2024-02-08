@@ -43,7 +43,11 @@ namespace net7.Services.CharacterService
         public async  Task<ServiceResponse<List<GetCharacterDto>>> GetAllCharacters()
         {
             var userId = GetUserId();
-            var dbCharacters = await _dataContext.Characters.Where(character => character.User!.Id == userId).ToListAsync();
+            var dbCharacters = await _dataContext.Characters
+                .Include(c => c.Weapon)
+                .Include(c => c.Skills)
+                .Where(character => character.User!.Id == userId)
+                .ToListAsync();
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>
             {
                 Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList()
@@ -104,6 +108,40 @@ namespace net7.Services.CharacterService
                 serviceResponse.Message = ex.Message;
                 return serviceResponse;
             }
+        }
+
+        public async Task<ServiceResponse<GetCharacterDto>> AddCharacterSkill(AddCharacterSkillDto skill)
+        {
+             var response = new ServiceResponse<GetCharacterDto>();
+            try 
+            {
+              var userId = GetUserId();
+              var character = await _dataContext.Characters.Include(c => c.Weapon).Include(c => c.Skills).FirstOrDefaultAsync(character => character.Id == skill.CharacterId && character.User!.Id == userId);
+             if(character is null){
+                response.Success = false;
+                response.Message = "Character not found"; 
+                return response;
+             }
+
+             var skillFromDb = await _dataContext.Skill.FirstOrDefaultAsync(s => s.Id == skill.SkillId);
+
+             if(skillFromDb is null){
+                response.Success = false;
+                response.Message = "Skill not found"; 
+                return response;
+             }
+
+             character.Skills!.Add(skillFromDb);
+             await _dataContext.SaveChangesAsync();
+             response.Data = _mapper.Map<GetCharacterDto>(character);
+            } 
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;         
+            }
+
+             return response;
         }
     }
 }

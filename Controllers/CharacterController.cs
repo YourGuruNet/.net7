@@ -5,7 +5,7 @@ namespace net7.Controllers
 {   
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class CharacterController : ControllerBase
     {
         private readonly ICharacterService characterService;
@@ -51,6 +51,12 @@ namespace net7.Controllers
                 return NotFound(response);
             }
             return Ok(response);
+        }
+
+        [HttpPost("Skill")]
+        public async Task<ActionResult<ServiceResponse<GetCharacterDto>>> AddCharacterSkill(AddCharacterSkillDto skill) 
+        {
+            return Ok(await characterService.AddCharacterSkill(skill));
         }
     }
 }

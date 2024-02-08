@@ -5,7 +5,7 @@ using net7.Repositories.Authentication;
 namespace net7.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class AuthenticationController : ControllerBase
     {
         private readonly IAuthenticationRepository _authenticationRepository;
